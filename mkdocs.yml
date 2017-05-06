@@ -1,0 +1,10 @@
+site_name: pytest-vcr
+site_description: Plugin for managing VCR.py cassettes
+site_author: Tomasz Kontusz
+
+theme: readthedocs
+
+repo_url: https://github.com/ktosiek/pytest-vcr
+
+pages:
+- Home: index.md
