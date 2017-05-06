@@ -58,7 +58,7 @@ def test_vcr_config(testdir):
             return {'record_mode': 'none'}
 
         @pytest.mark.vcr()
-        def test_method(self, vcr_cassette):
+        def test_method(vcr_cassette):
             print("Cassette record mode: {}".format(vcr_cassette.record_mode))
     """)
 
