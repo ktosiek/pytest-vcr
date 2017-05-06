@@ -107,5 +107,5 @@ def test_help_message(testdir):
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines([
         'vcr:',
-        '*--vcr-record-mode=MODE*Set the recording mode for VCR.py.',
+        '*--vcr-record-mode={*}',
     ])

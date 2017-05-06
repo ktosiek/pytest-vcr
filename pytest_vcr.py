@@ -6,14 +6,14 @@ import pytest
 def pytest_addoption(parser):
     group = parser.getgroup('vcr')
     group.addoption(
-        '--foo',
+        '--vcr-record-mode',
         action='store',
-        dest='dest_foo',
-        default='2017',
-        help='Set the value for the fixture "bar".'
+        dest='vcr_record_mode',
+        default=None,
+        choices=['once', 'new_episodes', 'none', 'all'],
+        help='Set the recording mode for VCR.py.'
     )
 
-    parser.addini('HELLO', 'Dummy pytest.ini setting')
 
 
 @pytest.fixture
