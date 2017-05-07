@@ -21,7 +21,7 @@ This will be overridden by marker and command-line options.
 
 ## vcr_cassette_path
 
-Default: `test_file_directory + "/_cassettes/" + vcr_cassette_name`
+Default: `test_file_directory + "/cassettes/" + vcr_cassette_name`
 
 Path to current test's cassette.
 

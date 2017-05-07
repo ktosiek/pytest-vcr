@@ -26,7 +26,7 @@ def test_iana():
 ```
 
 And that's it!
-A new file `_cassettes/test_iana.yaml` will be created next to your test file on the first run.
+A new file `cassettes/test_iana.yaml` will be created next to your test file on the first run.
 This file should be committed to a VCS.
 
 
@@ -50,7 +50,7 @@ For a way to specify separate configuration for different tests see [Configurati
 
 
 ## Changing the cassettes library path
-By default pytest-vcr will put cassettes in a `_cassettes` directory next to your tests.
+By default pytest-vcr will put cassettes in a `cassettes` directory next to your tests.
 You can change that by overriding the `vcr_cassette_path` fixture:
 
 ```python

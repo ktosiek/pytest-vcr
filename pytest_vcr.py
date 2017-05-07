@@ -59,7 +59,7 @@ def vcr_cassette_name(request):
 @pytest.fixture
 def vcr_cassette_path(request, vcr_cassette_name):
     test_dir = request.node.fspath.dirname
-    return os.path.join(test_dir, '_cassettes', vcr_cassette_name)
+    return os.path.join(test_dir, 'cassettes', vcr_cassette_name)
 
 
 @pytest.fixture

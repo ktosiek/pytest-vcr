@@ -20,7 +20,7 @@ def test_iana_example(testdir):
     result.stdout.fnmatch_lines(['*::test_iana PASSED'])
 
     cassette_path = testdir.tmpdir.join(
-        'subdir', '_cassettes', 'test_iana.yaml')
+        'subdir', 'cassettes', 'test_iana.yaml')
     assert cassette_path.size() > 50
 
 
