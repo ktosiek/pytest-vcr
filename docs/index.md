@@ -2,8 +2,6 @@
 
 Py.test plugin for managing [VCR.py](https://vcrpy.readthedocs.io/) cassettes.
 
-**WARNING: None of this is implemented yet, I'm trying to start with docs for the basic functionality I want before actually writing any code**
-If you have any comments on what's described here you are welcome to open an Issue here: [https://github.com/ktosiek/pytest-vcr/issues](https://github.com/ktosiek/pytest-vcr/issues)
 
 # Quick Start
 

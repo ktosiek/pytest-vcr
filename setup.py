@@ -25,7 +25,7 @@ setup(
     py_modules=['pytest_vcr'],
     install_requires=['pytest>=3.0.0', 'vcrpy'],
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 3 - Alpha',
         'Framework :: Pytest',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Testing',
