@@ -30,10 +30,13 @@ def vcr_cassette(request, vcr_config, vcr_cassette_path):
         path_transformer=VCR.ensure_suffix(".yaml"),
     )
     marker = request.node.get_marker('vcr')
+    record_mode = request.config.getoption('--vcr-record-mode')
 
     kwargs.update(vcr_config)
     if marker:
         kwargs.update(marker.kwargs)
+    if record_mode:
+        kwargs['record_mode'] = record_mode
 
     vcr = VCR(**kwargs)
     with vcr.use_cassette(vcr_cassette_path) as cassette:

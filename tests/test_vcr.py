@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
 
-import pytest
 
-
-@pytest.mark.skip()
 def test_iana_example(testdir):
     testdir.makepyfile("""
         import pytest
+        try:
+            from urllib.request import urlopen
+        except ImportError:
+            from urllib2 import urlopen
 
         @pytest.mark.vcr()
         def test_iana():
-            response = urllib2.urlopen('http://www.iana.org/domains/reserved').read()
-            assert 'Example domains' in response
+            response = urlopen('http://www.iana.org/domains/reserved').read()
+            assert b'Example domains' in response
     """)
 
     result = testdir.runpytest('-v')
 
     result.stdout.fnmatch_lines(['*::test_iana PASSED'])
 
-    assert testdir.join('_cassettes', 'test_iana.yaml').size() > 50
+    assert testdir.tmpdir.join('_cassettes', 'test_iana.yaml').size() > 50
 
 
 def test_overriding_cassette_path(testdir):
@@ -28,7 +29,8 @@ def test_overriding_cassette_path(testdir):
         @pytest.fixture
         def vcr_cassette_path(request, vcr_cassette_name):
             # Put all cassettes in vhs/{module}/{test}.yaml
-            return os.path.join('vhs', request.module.__name__, vcr_cassette_name)
+            return os.path.join(
+                'vhs', request.module.__name__, vcr_cassette_name)
 
         @pytest.mark.vcr()
         def test_show_cassette(vcr_cassette):
@@ -87,7 +89,6 @@ def test_marker_options(testdir):
     result.stdout.fnmatch_lines(['*Cassette record mode: none'])
 
 
-@pytest.mark.skip()
 def test_overriding_record_mode(testdir):
     testdir.makepyfile("""
         import pytest
@@ -97,12 +98,12 @@ def test_overriding_record_mode(testdir):
             return {'record_mode': 'none'}
 
         @pytest.mark.vcr(record_mode='once')
-        def test_method(self, vcr_cassette):
+        def test_method(vcr_cassette):
             print("Cassette record mode: {}".format(vcr_cassette.record_mode))
     """)
 
     result = testdir.runpytest('-s', '--vcr-record-mode', 'all')
-    result.stdout.fnmatch_lines(['Cassette record mode: all'])
+    result.stdout.fnmatch_lines(['*Cassette record mode: all'])
 
 
 def test_help_message(testdir):
