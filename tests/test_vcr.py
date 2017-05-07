@@ -2,7 +2,7 @@
 
 
 def test_iana_example(testdir):
-    testdir.makepyfile("""
+    testdir.makepyfile(**{'subdir/test_iana_example': """
         import pytest
         try:
             from urllib.request import urlopen
@@ -13,13 +13,15 @@ def test_iana_example(testdir):
         def test_iana():
             response = urlopen('http://www.iana.org/domains/reserved').read()
             assert b'Example domains' in response
-    """)
+    """})
 
     result = testdir.runpytest('-v')
 
     result.stdout.fnmatch_lines(['*::test_iana PASSED'])
 
-    assert testdir.tmpdir.join('_cassettes', 'test_iana.yaml').size() > 50
+    cassette_path = testdir.tmpdir.join(
+        'subdir', '_cassettes', 'test_iana.yaml')
+    assert cassette_path.size() > 50
 
 
 def test_overriding_cassette_path(testdir):
