@@ -158,4 +158,6 @@ def test_help_message(testdir):
 
 def test_marker_message(testdir):
     result = testdir.runpytest('--markers')
-    result.stdout.fnmatch_lines(['@pytest.mark.vcr: Mark the test as using VCR.py.'])
+    result.stdout.fnmatch_lines([
+        '@pytest.mark.vcr: Mark the test as using VCR.py.',
+    ])
