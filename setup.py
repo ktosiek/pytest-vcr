@@ -21,7 +21,7 @@ setup(
     license='MIT',
     url='https://github.com/ktosiek/pytest-vcr',
     description='Plugin for managing VCR.py cassettes',
-    long_description=read('README.rst'),
+    long_description=read('README.md'),
     py_modules=['pytest_vcr'],
     install_requires=['pytest>=3.0.0', 'vcrpy'],
     classifiers=[
