@@ -19,7 +19,7 @@ Annotate your tests:
 @pytest.mark.vcr()
 def test_iana():
     response = urlopen('http://www.iana.org/domains/reserved').read()
-    assert 'Example domains' in response
+    assert b'Example domains' in response
 ```
 
 And that's it!
