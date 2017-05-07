@@ -18,7 +18,7 @@ Annotate your tests:
 ```python
 @pytest.mark.vcr()
 def test_iana():
-    response = urllib2.urlopen('http://www.iana.org/domains/reserved').read()
+    response = urlopen('http://www.iana.org/domains/reserved').read()
     assert 'Example domains' in response
 ```
 

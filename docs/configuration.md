@@ -38,7 +38,7 @@ All options provided on the marker will be passed to the VCR constructor, for ex
 @pytest.mark.vcr(ignore_localhost=True)
 def test_local_and_remote():
     # This one will replay from the cassette
-    urllib2.urlopen('http://www.iana.org/domains/reserved').read()
+    urlopen('http://www.iana.org/domains/reserved').read()
     # This one will always be downloaded
-    urllib2.urlopen('http://127.0.0.1/').read()
+    urlopen('http://127.0.0.1/').read()
 ```
