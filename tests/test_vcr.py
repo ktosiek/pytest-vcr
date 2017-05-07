@@ -21,10 +21,9 @@ def test_iana_example(testdir):
     assert testdir.join('_cassettes', 'test_iana.yaml').size() > 50
 
 
-@pytest.mark.skip()
 def test_overriding_cassette_path(testdir):
     testdir.makepyfile("""
-        import pytest
+        import pytest, os
 
         @pytest.fixture
         def vcr_cassette_path(request, vcr_cassette_name):
@@ -37,7 +36,7 @@ def test_overriding_cassette_path(testdir):
     """)
 
     result = testdir.runpytest('-s')
-    result.stdout.fnmatch_lines(['Cassette: vhs/*/test_show_cassette.yaml'])
+    result.stdout.fnmatch_lines(['*Cassette: vhs/*/test_show_cassette.yaml'])
 
 
 def test_cassette_name_for_classes(testdir):
