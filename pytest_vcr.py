@@ -26,9 +26,16 @@ def _vcr_marker(request):
 @pytest.yield_fixture
 def vcr_cassette(request, vcr_config, vcr_cassette_path):
     """Wrap a test in a VCR.py cassette"""
-    vcr = VCR(
+    kwargs = dict(
         path_transformer=VCR.ensure_suffix(".yaml"),
-        **vcr_config)
+    )
+    marker = request.node.get_marker('vcr')
+
+    kwargs.update(vcr_config)
+    if marker:
+        kwargs.update(marker.kwargs)
+
+    vcr = VCR(**kwargs)
     with vcr.use_cassette(vcr_cassette_path) as cassette:
         yield cassette
 

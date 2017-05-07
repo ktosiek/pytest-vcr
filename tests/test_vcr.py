@@ -70,7 +70,6 @@ def test_vcr_config(testdir):
     result.stdout.fnmatch_lines(['*Cassette record mode: none'])
 
 
-@pytest.mark.skip()
 def test_marker_options(testdir):
     testdir.makepyfile("""
         import pytest
@@ -80,12 +79,12 @@ def test_marker_options(testdir):
             return {'record_mode': 'all'}
 
         @pytest.mark.vcr(record_mode='none')
-        def test_method(self, vcr_cassette):
+        def test_method(vcr_cassette):
             print("Cassette record mode: {}".format(vcr_cassette.record_mode))
     """)
 
     result = testdir.runpytest('-s')
-    result.stdout.fnmatch_lines(['Cassette record mode: none'])
+    result.stdout.fnmatch_lines(['*Cassette record mode: none'])
 
 
 @pytest.mark.skip()
