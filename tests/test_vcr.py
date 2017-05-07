@@ -131,6 +131,20 @@ def test_marking_whole_class(testdir):
     assert result.ret == 0
 
 
+def test_separate_cassettes_for_parametrized_tests(testdir):
+    testdir.makepyfile("""
+        import pytest
+
+        @pytest.mark.vcr()
+        @pytest.mark.parametrize('arg', ['a', 'b'])
+        def test_parameters(arg, vcr_cassette_name):
+            assert vcr_cassette_name == 'test_parameters[{}]'.format(arg)
+    """)
+
+    result = testdir.runpytest('-s')
+    assert result.ret == 0
+
+
 def test_help_message(testdir):
     result = testdir.runpytest(
         '--help',

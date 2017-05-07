@@ -48,8 +48,8 @@ def vcr_cassette_name(request):
     """Name of the VCR cassette"""
     f = request.function
     if hasattr(f, '__self__'):
-        return f.__self__.__class__.__name__ + '.' + f.__name__
-    return f.__name__
+        return f.__self__.__class__.__name__ + '.' + request.node.name
+    return request.node.name
 
 
 @pytest.fixture
