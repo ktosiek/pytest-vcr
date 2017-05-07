@@ -108,6 +108,29 @@ def test_overriding_record_mode(testdir):
     result.stdout.fnmatch_lines(['*Cassette record mode: all'])
 
 
+def test_marking_whole_class(testdir):
+    testdir.makepyfile("""
+        import pytest
+
+        has_cassette = False
+
+        @pytest.yield_fixture
+        def vcr_cassette(vcr_cassette):
+            global has_cassette
+            has_cassette = True
+            yield vcr_cassette
+            has_cassette = False
+
+        @pytest.mark.vcr()
+        class TestClass(object):
+            def test_method(self):
+                assert has_cassette
+    """)
+
+    result = testdir.runpytest('-s')
+    assert result.ret == 0
+
+
 def test_help_message(testdir):
     result = testdir.runpytest(
         '--help',
