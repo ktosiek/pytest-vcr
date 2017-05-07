@@ -63,7 +63,7 @@ def test_vcr_config(testdir):
     """)
 
     result = testdir.runpytest('-s')
-    result.stdout.fnmatch_lines(['Cassette record mode: none'])
+    result.stdout.fnmatch_lines(['*Cassette record mode: none'])
 
 
 def test_marker_options(testdir):
