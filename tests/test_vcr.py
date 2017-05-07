@@ -154,3 +154,8 @@ def test_help_message(testdir):
         'vcr:',
         '*--vcr-record-mode={*}',
     ])
+
+
+def test_marker_message(testdir):
+    result = testdir.runpytest('--markers')
+    result.stdout.fnmatch_lines(['@pytest.mark.vcr: Mark the test as using VCR.py.'])

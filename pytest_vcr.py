@@ -15,6 +15,10 @@ def pytest_addoption(parser):
         help='Set the recording mode for VCR.py.'
     )
 
+def pytest_load_initial_conftests(early_config, parser, args):
+    early_config.addinivalue_line(
+        'markers',
+        'vcr: Mark the test as using VCR.py.')
 
 @pytest.fixture(autouse=True)
 def _vcr_marker(request):
