@@ -46,7 +46,7 @@ def test_cassette_name_for_classes(testdir):
     """)
 
     result = testdir.runpytest('-s')
-    result.stdout.fnmatch_lines(['Cassette: TestClass.test_method'])
+    result.stdout.fnmatch_lines(['*Cassette: TestClass.test_method'])
 
 
 def test_vcr_config(testdir):

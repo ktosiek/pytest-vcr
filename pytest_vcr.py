@@ -15,7 +15,9 @@ def pytest_addoption(parser):
     )
 
 
-
 @pytest.fixture
-def bar(request):
-    return request.config.option.dest_foo
+def vcr_cassette_name(request):
+    f = request.function
+    if hasattr(f, '__self__'):
+        return f.__self__.__class__.__name__ + '.' + f.__name__
+    return f.__name__
