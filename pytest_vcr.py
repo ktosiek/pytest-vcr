@@ -45,11 +45,13 @@ def vcr_cassette(request, vcr_config, vcr_cassette_path):
         kwargs['record_mode'] = record_mode
 
     matchers = kwargs.pop('matchers', {})
-    match_on = kwargs.pop('match_on', [])    
+    if matchers:
+        match_on = kwargs.pop('match_on', [])    
     vcr = VCR(**kwargs)
-    for matcher_name, matcher_func in matchers.items():
-        vcr.register_matcher(matcher_name, matcher_func)
-    vcr.match_on = match_on
+    if matchers:
+        for matcher_name, matcher_func in matchers.items():
+            vcr.register_matcher(matcher_name, matcher_func)
+        vcr.match_on = match_on
     with vcr.use_cassette(vcr_cassette_path) as cassette:
         yield cassette
 
