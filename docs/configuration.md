@@ -31,6 +31,22 @@ Default: name of the test
 
 Name of the current test's cassette
 
+## vcr
+
+Default: an instance of `VCR`
+
+This is the instance used for creating cassettes.
+You'd override this fixture to register your own matchers, serializers or persisters, for example:
+
+```python
+@pytest.fixture
+def vcr(vcr):
+    vcr.register_matcher('my_matcher', my_matcher)
+    vcr.match_on = ['my_matcher']  # This can also go into vcr_config or marker kwargs
+    return vcr
+```
+
+
 # Marker options
 All options provided on the marker will be passed to the VCR constructor, for example:
 

@@ -24,6 +24,44 @@ def test_iana_example(testdir):
     assert cassette_path.size() > 50
 
 
+def test_custom_matchers(testdir):
+    testdir.makepyfile("""
+        import pytest
+        try:
+            from urllib.request import urlopen
+        except ImportError:
+            from urllib2 import urlopen
+
+        @pytest.fixture
+        def vcr(vcr):
+            vcr.register_matcher('my_matcher', lambda a, b: True)
+            vcr.match_on = ['my_matcher']
+            return vcr
+
+        @pytest.mark.vcr()
+        def test_custom_matchers_iana():
+            response = urlopen('http://www.iana.org/domains/reserved').read()
+            assert b'Test' in response
+    """)
+
+    testdir.tmpdir.mkdir('cassettes').join('test_custom_matchers_iana.yaml') \
+        .write('''
+version: 1
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://httpbin.org/ip
+  response:
+    body: {string: !!python/unicode "Test"}
+    headers: {}
+    status: {code: 200, message: OK}''')
+
+    result = testdir.runpytest('-v', '-s', '--vcr-record-mode=none')
+    assert result.ret == 0
+
+
 def test_overriding_cassette_path(testdir):
     testdir.makepyfile("""
         import pytest, os
