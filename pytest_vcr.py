@@ -29,9 +29,9 @@ def _vcr_marker(request):
         request.getfixturevalue('vcr_cassette')
 
 
-@pytest.yield_fixture
-def vcr_cassette(request, vcr_config, vcr_cassette_path):
-    """Wrap a test in a VCR.py cassette"""
+@pytest.fixture
+def vcr(request, vcr_config):
+    """The VCR instance"""
     kwargs = dict(
         path_transformer=VCR.ensure_suffix(".yaml"),
     )
@@ -45,6 +45,12 @@ def vcr_cassette(request, vcr_config, vcr_cassette_path):
         kwargs['record_mode'] = record_mode
 
     vcr = VCR(**kwargs)
+    return vcr
+
+
+@pytest.yield_fixture
+def vcr_cassette(vcr, vcr_cassette_path):
+    """Wrap a test in a VCR.py cassette"""
     with vcr.use_cassette(vcr_cassette_path) as cassette:
         yield cassette
 
