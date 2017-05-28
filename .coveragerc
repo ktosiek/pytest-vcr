@@ -1,0 +1,6 @@
+[paths]
+source = pytest_vcr
+
+[run]
+branch = true
+source = pytest_vcr
