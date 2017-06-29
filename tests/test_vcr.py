@@ -27,6 +27,27 @@ def test_iana_example(testdir):
     assert cassette_path.size() > 50
 
 
+def test_disable_vcr(testdir):
+    testdir.makepyfile(**{'subdir/test_iana_example': """
+        import pytest
+        try:
+            from urllib.request import urlopen
+        except ImportError:
+            from urllib2 import urlopen
+
+        @pytest.mark.vcr
+        def test_disable_vcr_iana():
+            response = urlopen('http://www.iana.org/domains/reserved').read()
+            assert b'Example domains' in response
+    """})
+
+    result = testdir.runpytest('--disable-vcr', '-v')
+    result.assert_outcomes(1, 0, 0)
+
+    cassette_dir_path = testdir.tmpdir.join('subdir', 'cassettes')
+    assert not cassette_dir_path.check()
+
+
 def test_custom_matchers(testdir):
     testdir.makepyfile("""
         import pytest

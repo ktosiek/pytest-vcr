@@ -14,6 +14,12 @@ def pytest_addoption(parser):
         choices=['once', 'new_episodes', 'none', 'all'],
         help='Set the recording mode for VCR.py.'
     )
+    group.addoption(
+        '--disable-vcr',
+        action='store_true',
+        dest='disable_vcr',
+        help='Run tests without playing back from VCR.py cassettes'
+    )
 
 
 def pytest_load_initial_conftests(early_config, parser, args):
@@ -25,7 +31,8 @@ def pytest_load_initial_conftests(early_config, parser, args):
 @pytest.fixture(autouse=True)
 def _vcr_marker(request):
     marker = request.node.get_marker('vcr')
-    if marker:
+    disable_vcr = request.config.getoption('--disable-vcr')
+    if marker and not disable_vcr:
         request.getfixturevalue('vcr_cassette')
 
 
