@@ -58,5 +58,5 @@ def vcr_cassette_path(request, vcr_cassette_name):
 
 
 # Running on CI
-When running your tests on CI it's recommended to use the `--vcr-record-mode=none` option.
+When running your tests on CI it's recommended to use the `--vcr-record=none` option.
 This way you can make sure that you have committed all the cassettes.

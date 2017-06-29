@@ -7,9 +7,9 @@ from vcr import VCR
 def pytest_addoption(parser):
     group = parser.getgroup('vcr')
     group.addoption(
-        '--vcr-record-mode',
+        '--vcr-record',
         action='store',
-        dest='vcr_record_mode',
+        dest='vcr_record',
         default=None,
         choices=['once', 'new_episodes', 'none', 'all'],
         help='Set the recording mode for VCR.py.'
@@ -36,7 +36,7 @@ def vcr(request, vcr_config):
         path_transformer=VCR.ensure_suffix(".yaml"),
     )
     marker = request.node.get_marker('vcr')
-    record_mode = request.config.getoption('--vcr-record-mode')
+    record_mode = request.config.getoption('--vcr-record')
 
     kwargs.update(vcr_config)
     if marker:

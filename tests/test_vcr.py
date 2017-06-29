@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import pytest
+# Check that the plugin has been properly installed before proceeding
+assert pytest.config.pluginmanager.hasplugin("vcr")
+
 
 def test_iana_example(testdir):
     testdir.makepyfile(**{'subdir/test_iana_example': """
@@ -9,15 +13,14 @@ def test_iana_example(testdir):
         except ImportError:
             from urllib2 import urlopen
 
-        @pytest.mark.vcr()
+        @pytest.mark.vcr
         def test_iana():
             response = urlopen('http://www.iana.org/domains/reserved').read()
             assert b'Example domains' in response
     """})
 
     result = testdir.runpytest('-v')
-
-    result.stdout.fnmatch_lines(['*::test_iana PASSED'])
+    result.assert_outcomes(1, 0, 0)
 
     cassette_path = testdir.tmpdir.join(
         'subdir', 'cassettes', 'test_iana.yaml')
@@ -38,10 +41,10 @@ def test_custom_matchers(testdir):
             vcr.match_on = ['my_matcher']
             return vcr
 
-        @pytest.mark.vcr()
+        @pytest.mark.vcr
         def test_custom_matchers_iana():
             response = urlopen('http://www.iana.org/domains/reserved').read()
-            assert b'Test' in response
+            assert b'From cassette fixture' in response
     """)
 
     testdir.tmpdir.mkdir('cassettes').join('test_custom_matchers_iana.yaml') \
@@ -54,11 +57,11 @@ interactions:
     method: GET
     uri: http://httpbin.org/ip
   response:
-    body: {string: !!python/unicode "Test"}
+    body: {string: !!python/unicode "From cassette fixture"}
     headers: {}
     status: {code: 200, message: OK}''')
 
-    result = testdir.runpytest('-v', '-s', '--vcr-record-mode=none')
+    result = testdir.runpytest('-v', '-s', '--vcr-record=none')
     assert result.ret == 0
 
 
@@ -72,12 +75,13 @@ def test_overriding_cassette_path(testdir):
             return os.path.join(
                 'vhs', request.module.__name__, vcr_cassette_name)
 
-        @pytest.mark.vcr()
+        @pytest.mark.vcr
         def test_show_cassette(vcr_cassette):
             print("Cassette: {}".format(vcr_cassette._path))
     """)
 
     result = testdir.runpytest('-s')
+    result.assert_outcomes(1, 0, 0)
     result.stdout.fnmatch_lines(['*Cassette: vhs/*/test_show_cassette.yaml'])
 
 
@@ -85,7 +89,7 @@ def test_cassette_name_for_classes(testdir):
     testdir.makepyfile("""
         import pytest
 
-        @pytest.mark.vcr()
+        @pytest.mark.vcr
         class TestClass:
             def test_method(self, vcr_cassette_name):
                 print("Cassette: {}".format(vcr_cassette_name))
@@ -103,12 +107,13 @@ def test_vcr_config(testdir):
         def vcr_config():
             return {'record_mode': 'none'}
 
-        @pytest.mark.vcr()
+        @pytest.mark.vcr
         def test_method(vcr_cassette):
             print("Cassette record mode: {}".format(vcr_cassette.record_mode))
     """)
 
     result = testdir.runpytest('-s')
+    result.assert_outcomes(1, 0, 0)
     result.stdout.fnmatch_lines(['*Cassette record mode: none'])
 
 
@@ -126,6 +131,7 @@ def test_marker_options(testdir):
     """)
 
     result = testdir.runpytest('-s')
+    result.assert_outcomes(1, 0, 0)
     result.stdout.fnmatch_lines(['*Cassette record mode: none'])
 
 
@@ -142,7 +148,8 @@ def test_overriding_record_mode(testdir):
             print("Cassette record mode: {}".format(vcr_cassette.record_mode))
     """)
 
-    result = testdir.runpytest('-s', '--vcr-record-mode', 'all')
+    result = testdir.runpytest('-s', '--vcr-record', 'all')
+    result.assert_outcomes(1, 0, 0)
     result.stdout.fnmatch_lines(['*Cassette record mode: all'])
 
 
@@ -159,7 +166,7 @@ def test_marking_whole_class(testdir):
             yield vcr_cassette
             has_cassette = False
 
-        @pytest.mark.vcr()
+        @pytest.mark.vcr
         class TestClass(object):
             def test_method(self):
                 assert has_cassette
@@ -173,7 +180,7 @@ def test_separate_cassettes_for_parametrized_tests(testdir):
     testdir.makepyfile("""
         import pytest
 
-        @pytest.mark.vcr()
+        @pytest.mark.vcr
         @pytest.mark.parametrize('arg', ['a', 'b'])
         def test_parameters(arg, vcr_cassette_name):
             assert vcr_cassette_name == 'test_parameters[{}]'.format(arg)
@@ -190,7 +197,7 @@ def test_help_message(testdir):
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines([
         'vcr:',
-        '*--vcr-record-mode={*}',
+        '*--vcr-record={*}',
     ])
 
 
