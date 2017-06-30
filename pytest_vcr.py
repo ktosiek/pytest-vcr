@@ -45,24 +45,20 @@ def _vcr_marker(request):
         request.getfixturevalue('vcr_cassette')
 
 
-@pytest.fixture
-def vcr(request, vcr_config, vcr_cassette_dir, pytestconfig):
+@pytest.fixture(scope='module')
+def vcr(request, pytestconfig, vcr_config, vcr_cassette_dir, ):
     """The VCR instance"""
     kwargs = dict(
         cassette_library_dir=vcr_cassette_dir,
         path_transformer=VCR.ensure_suffix(".yaml"),
     )
-    marker = request.node.get_marker('vcr')
+    kwargs.update(vcr_config)
     record_mode = request.config.getoption('--vcr-record-mode')
     if record_mode:
         pytestconfig.warn("C1",
                           "--vcr-record-mode has been deprecated and will be removed in a future "
                           "release. Use --vcr-record instead.")
     record_mode = request.config.getoption('--vcr-record') or record_mode
-
-    kwargs.update(vcr_config)
-    if marker:
-        kwargs.update(marker.kwargs)
     if record_mode:
         kwargs['record_mode'] = record_mode
 
@@ -77,13 +73,29 @@ def vcr(request, vcr_config, vcr_cassette_dir, pytestconfig):
 
 
 @pytest.fixture
-def vcr_cassette(vcr, vcr_cassette_name):
+def vcr_cassette(request, vcr, vcr_cassette_name):
     """Wrap a test in a VCR.py cassette"""
-    with vcr.use_cassette(vcr_cassette_name) as cassette:
+    marker = request.node.get_marker('vcr')
+    record_mode = request.config.getoption('--vcr-record-mode')
+    record_mode = request.config.getoption('--vcr-record') or record_mode
+
+    kwargs = {}
+    if marker:
+        kwargs.update(marker.kwargs)
+    if record_mode:
+        kwargs['record_mode'] = record_mode
+
+    disable_vcr = request.config.getoption('--disable-vcr')
+    if disable_vcr:
+        # Set mode to record but discard all responses to disable both recording and playback
+        kwargs['record_mode'] = 'new_episodes'
+        kwargs['before_record_response'] = lambda *args, **kwargs: None
+
+    with vcr.use_cassette(vcr_cassette_name, **kwargs) as cassette:
         yield cassette
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def vcr_cassette_dir(request):
     test_dir = request.node.fspath.dirname
     return os.path.join(test_dir, 'cassettes')
@@ -98,7 +110,7 @@ def vcr_cassette_name(request):
     return request.node.name
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def vcr_config():
     """Custom configuration for VCR.py"""
     return {}

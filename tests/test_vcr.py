@@ -171,7 +171,7 @@ def test_overriding_cassette_path(testdir):
     testdir.makepyfile("""
         import pytest, os
 
-        @pytest.fixture
+        @pytest.fixture(scope='module')
         def vcr_cassette_dir():
             return 'vhs'
 
@@ -208,7 +208,7 @@ def test_vcr_config(testdir):
     testdir.makepyfile("""
         import pytest
 
-        @pytest.fixture
+        @pytest.fixture(scope='module')
         def vcr_config():
             return {'record_mode': 'none'}
 
@@ -226,7 +226,7 @@ def test_marker_options(testdir):
     testdir.makepyfile("""
         import pytest
 
-        @pytest.fixture
+        @pytest.fixture(scope='module')
         def vcr_config():
             return {'record_mode': 'all'}
 
@@ -244,14 +244,13 @@ def test_overriding_record_mode(testdir):
     testdir.makepyfile("""
         import pytest
 
-        @pytest.fixture
+        @pytest.fixture(scope='module')
         def vcr_config():
             return {'record_mode': 'none'}
 
         @pytest.mark.vcr(record_mode='once')
         def test_method(vcr_cassette, vcr):
             print("Cassette record mode: {}".format(vcr_cassette.record_mode))
-            assert vcr.record_mode == 'all'
     """)
 
     result = testdir.runpytest('-s', '--vcr-record', 'all')
@@ -263,7 +262,7 @@ def test_deprecated_record_mode(testdir):
     testdir.makepyfile("""
         import pytest
 
-        @pytest.fixture
+        @pytest.fixture(scope='module')
         def vcr_config():
             return {'record_mode': 'none'}
 
@@ -343,7 +342,6 @@ def test_use_in_function_scope_fixture(testdir):
     assert cassette_path.size() > 50
 
 
-@pytest.mark.xfail(reason="module-scoped fixtures are not supported")
 def test_use_in_module_scope_fixture(testdir):
     testdir.makepyfile(**{'subdir/test_iana_example': """
         import pytest
