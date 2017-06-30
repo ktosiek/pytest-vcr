@@ -46,9 +46,10 @@ def _vcr_marker(request):
 
 
 @pytest.fixture
-def vcr(request, vcr_config, pytestconfig):
+def vcr(request, vcr_config, vcr_cassette_dir, pytestconfig):
     """The VCR instance"""
     kwargs = dict(
+        cassette_library_dir=vcr_cassette_dir,
         path_transformer=VCR.ensure_suffix(".yaml"),
     )
     marker = request.node.get_marker('vcr')
@@ -75,11 +76,17 @@ def vcr(request, vcr_config, pytestconfig):
     return vcr
 
 
-@pytest.yield_fixture
-def vcr_cassette(vcr, vcr_cassette_path):
+@pytest.fixture
+def vcr_cassette(vcr, vcr_cassette_name):
     """Wrap a test in a VCR.py cassette"""
-    with vcr.use_cassette(vcr_cassette_path) as cassette:
+    with vcr.use_cassette(vcr_cassette_name) as cassette:
         yield cassette
+
+
+@pytest.fixture
+def vcr_cassette_dir(request):
+    test_dir = request.node.fspath.dirname
+    return os.path.join(test_dir, 'cassettes')
 
 
 @pytest.fixture
@@ -89,12 +96,6 @@ def vcr_cassette_name(request):
     if hasattr(f, '__self__'):
         return f.__self__.__class__.__name__ + '.' + request.node.name
     return request.node.name
-
-
-@pytest.fixture
-def vcr_cassette_path(request, vcr_cassette_name):
-    test_dir = request.node.fspath.dirname
-    return os.path.join(test_dir, 'cassettes', vcr_cassette_name)
 
 
 @pytest.fixture

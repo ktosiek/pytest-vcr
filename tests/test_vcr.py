@@ -172,10 +172,13 @@ def test_overriding_cassette_path(testdir):
         import pytest, os
 
         @pytest.fixture
-        def vcr_cassette_path(request, vcr_cassette_name):
+        def vcr_cassette_dir():
+            return 'vhs'
+
+        @pytest.fixture
+        def vcr_cassette_name(vcr_cassette_dir, request, vcr_cassette_name):
             # Put all cassettes in vhs/{module}/{test}.yaml
-            return os.path.join(
-                'vhs', request.module.__name__, vcr_cassette_name)
+            return os.path.join(vcr_cassette_dir, request.module.__name__, vcr_cassette_name)
 
         @pytest.mark.vcr
         def test_show_cassette(vcr_cassette):
@@ -246,8 +249,9 @@ def test_overriding_record_mode(testdir):
             return {'record_mode': 'none'}
 
         @pytest.mark.vcr(record_mode='once')
-        def test_method(vcr_cassette):
+        def test_method(vcr_cassette, vcr):
             print("Cassette record mode: {}".format(vcr_cassette.record_mode))
+            assert vcr.record_mode == 'all'
     """)
 
     result = testdir.runpytest('-s', '--vcr-record', 'all')
@@ -309,6 +313,93 @@ def test_separate_cassettes_for_parametrized_tests(testdir):
 
     result = testdir.runpytest('-s')
     assert result.ret == 0
+
+
+def test_use_in_function_scope_fixture(testdir):
+    """Test that the VCR instance can be used from fixtures and that the cassettes
+    land in the correct location."""
+    testdir.makepyfile(**{'subdir/test_iana_example': """
+        import pytest
+        try:
+            from urllib.request import urlopen
+        except ImportError:
+            from urllib2 import urlopen
+        
+        @pytest.fixture
+        def iana_response(vcr):
+            with vcr.use_cassette('iana_response_fixture'):
+                response = urlopen('http://www.iana.org/domains/reserved').read()
+            return response
+
+        def test_with_fixture(iana_response):
+            assert b'Example domains' in iana_response
+    """})
+
+    result = testdir.runpytest('-v')
+    result.assert_outcomes(1, 0, 0)
+
+    cassette_path = testdir.tmpdir.join(
+        'subdir', 'cassettes', 'iana_response_fixture.yaml')
+    assert cassette_path.size() > 50
+
+
+@pytest.mark.xfail(reason="module-scoped fixtures are not supported")
+def test_use_in_module_scope_fixture(testdir):
+    testdir.makepyfile(**{'subdir/test_iana_example': """
+        import pytest
+        try:
+            from urllib.request import urlopen
+        except ImportError:
+            from urllib2 import urlopen
+        
+        @pytest.fixture(scope='module')
+        def iana_response(vcr):
+            with vcr.use_cassette('iana_response_fixture'):
+                response = urlopen('http://www.iana.org/domains/reserved').read()
+            return response
+
+        def test_with_fixture(iana_response):
+            assert b'Example domains' in iana_response
+    """})
+
+    result = testdir.runpytest('-v')
+    result.assert_outcomes(1, 0, 0)
+
+    cassette_path = testdir.tmpdir.join(
+        'subdir', 'cassettes', 'iana_response_fixture.yaml')
+    assert cassette_path.size() > 50
+
+
+@pytest.mark.xfail(reason="session-scoped fixtures are not supported")
+def test_use_in_session_scope_fixture(testdir):
+    testdir.makepyfile(**{'subdir/test_iana_example': """
+        import pytest
+        try:
+            from urllib.request import urlopen
+        except ImportError:
+            from urllib2 import urlopen
+
+        @pytest.fixture(scope='session')
+        def vcr_cassette_dir():
+            test_dir = dirname(abspath(__file__))
+            return os.path.join(test_dir, 'cassettes')
+
+        @pytest.fixture(scope='session')
+        def iana_response(vcr):
+            with vcr.use_cassette('iana_response_fixture'):
+                response = urlopen('http://www.iana.org/domains/reserved').read()
+            return response
+
+        def test_with_fixture(iana_response):
+            assert b'Example domains' in iana_response
+    """})
+
+    result = testdir.runpytest('-v')
+    result.assert_outcomes(1, 0, 0)
+
+    cassette_path = testdir.tmpdir.join(
+        'subdir', 'cassettes', 'iana_response_fixture.yaml')
+    assert cassette_path.size() > 50
 
 
 def test_help_message(testdir):
