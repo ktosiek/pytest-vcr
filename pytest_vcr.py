@@ -45,29 +45,35 @@ def _vcr_marker(request):
         request.getfixturevalue('vcr_cassette')
 
 
+def _update_kwargs(request, kwargs):
+    marker = request.node.get_marker('vcr')
+    if marker:
+        kwargs.update(marker.kwargs)
+
+    record_mode = request.config.getoption('--vcr-record-mode')
+    record_mode = request.config.getoption('--vcr-record') or record_mode
+    if record_mode:
+        kwargs['record_mode'] = record_mode
+
+    if request.config.getoption('--disable-vcr'):
+        # Set mode to record but discard all responses to disable both recording and playback
+        kwargs['record_mode'] = 'new_episodes'
+        kwargs['before_record_response'] = lambda *args, **kwargs: None
+
+
 @pytest.fixture(scope='module')
 def vcr(request, pytestconfig, vcr_config, vcr_cassette_dir, ):
     """The VCR instance"""
+    if request.config.getoption('--vcr-record-mode'):
+        pytestconfig.warn("C1",
+                          "--vcr-record-mode has been deprecated and will be removed in a future "
+                          "release. Use --vcr-record instead.")
     kwargs = dict(
         cassette_library_dir=vcr_cassette_dir,
         path_transformer=VCR.ensure_suffix(".yaml"),
     )
     kwargs.update(vcr_config)
-    record_mode = request.config.getoption('--vcr-record-mode')
-    if record_mode:
-        pytestconfig.warn("C1",
-                          "--vcr-record-mode has been deprecated and will be removed in a future "
-                          "release. Use --vcr-record instead.")
-    record_mode = request.config.getoption('--vcr-record') or record_mode
-    if record_mode:
-        kwargs['record_mode'] = record_mode
-
-    disable_vcr = request.config.getoption('--disable-vcr')
-    if disable_vcr:
-        # Set mode to record but discard all responses to disable both recording and playback
-        kwargs['record_mode'] = 'new_episodes'
-        kwargs['before_record_response'] = lambda *args, **kwargs: None
-
+    _update_kwargs(request, kwargs)
     vcr = VCR(**kwargs)
     return vcr
 
@@ -75,22 +81,8 @@ def vcr(request, pytestconfig, vcr_config, vcr_cassette_dir, ):
 @pytest.fixture
 def vcr_cassette(request, vcr, vcr_cassette_name):
     """Wrap a test in a VCR.py cassette"""
-    marker = request.node.get_marker('vcr')
-    record_mode = request.config.getoption('--vcr-record-mode')
-    record_mode = request.config.getoption('--vcr-record') or record_mode
-
     kwargs = {}
-    if marker:
-        kwargs.update(marker.kwargs)
-    if record_mode:
-        kwargs['record_mode'] = record_mode
-
-    disable_vcr = request.config.getoption('--disable-vcr')
-    if disable_vcr:
-        # Set mode to record but discard all responses to disable both recording and playback
-        kwargs['record_mode'] = 'new_episodes'
-        kwargs['before_record_response'] = lambda *args, **kwargs: None
-
+    _update_kwargs(request, kwargs)
     with vcr.use_cassette(vcr_cassette_name, **kwargs) as cassette:
         yield cassette
 

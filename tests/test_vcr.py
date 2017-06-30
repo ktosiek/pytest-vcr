@@ -76,7 +76,7 @@ def test_disable_vcr_with_existing_cassette(testdir):
         except ImportError:
             from urllib2 import urlopen
 
-        @pytest.fixture
+        @pytest.fixture(scope='module')
         def vcr(vcr):
             # Make sure that modifying the VCR instance does not break anything
             vcr.register_matcher('xx', lambda x: x)
@@ -137,7 +137,7 @@ def test_custom_matchers(testdir):
         except ImportError:
             from urllib2 import urlopen
 
-        @pytest.fixture
+        @pytest.fixture(scope='module')
         def vcr(vcr):
             vcr.register_matcher('my_matcher', lambda a, b: True)
             vcr.match_on = ['my_matcher']
