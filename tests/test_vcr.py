@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+
 # Check that the plugin has been properly installed before proceeding
 assert pytest.config.pluginmanager.hasplugin("vcr")
 
@@ -35,17 +36,97 @@ def test_disable_vcr(testdir):
         except ImportError:
             from urllib2 import urlopen
 
+        @pytest.fixture
+        def vcr(vcr):
+            # Make sure that modifying the VCR instance does not break anything
+            vcr.register_matcher('xx', lambda x: x)
+            vcr.record_mode = vcr.record_mode
+            return vcr
+
         @pytest.mark.vcr
-        def test_disable_vcr_iana():
+        def test_disable_vcr_iana_marking():
             response = urlopen('http://www.iana.org/domains/reserved').read()
+            assert b'Example domains' in response
+
+        def test_disable_vcr_iana_fixture(vcr_cassette):
+            response = urlopen('http://www.iana.org/domains/reserved').read()
+            assert b'Example domains' in response
+
+        def test_disable_vcr_iana_vcr(vcr_cassette, vcr):
+            with vcr.use_cassette('test_disable_vcr_iana_vcr'):
+                response = urlopen('http://www.iana.org/domains/reserved').read()
             assert b'Example domains' in response
     """})
 
-    result = testdir.runpytest('--disable-vcr', '-v')
-    result.assert_outcomes(1, 0, 0)
+    result = testdir.runpytest('--vcr-record=none', '-v')
+    result.assert_outcomes(0, 0, 3)
+
+    result = testdir.runpytest('--disable-vcr', '--vcr-record=none', '-v')
+    result.assert_outcomes(3, 0, 0)
 
     cassette_dir_path = testdir.tmpdir.join('subdir', 'cassettes')
     assert not cassette_dir_path.check()
+
+
+def test_disable_vcr_with_existing_cassette(testdir):
+    testdir.makepyfile(**{'subdir/test_iana_example': """
+        import pytest
+        try:
+            from urllib.request import urlopen
+        except ImportError:
+            from urllib2 import urlopen
+
+        @pytest.fixture
+        def vcr(vcr):
+            # Make sure that modifying the VCR instance does not break anything
+            vcr.register_matcher('xx', lambda x: x)
+            vcr.record_mode = vcr.record_mode
+            return vcr
+
+        @pytest.mark.vcr
+        def test_disable_vcr_iana_marking():
+            response = urlopen('http://www.iana.org/domains/reserved').read()
+            assert b'Example domains' in response
+
+        def test_disable_vcr_iana_fixture(vcr_cassette):
+            response = urlopen('http://www.iana.org/domains/reserved').read()
+            assert b'Example domains' in response
+
+        def test_disable_vcr_iana_vcr(vcr_cassette, vcr):
+            with vcr.use_cassette('test_disable_vcr_iana_vcr'):
+                response = urlopen('http://www.iana.org/domains/reserved').read()
+            assert b'Example domains' in response
+    """})
+
+    cassette_content = '''
+version: 1
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://httpbin.org/ip
+  response:
+    body: {string: !!python/unicode "From cassette fixture"}
+    headers: {}
+    status: {code: 200, message: OK}'''
+
+    cassette_dir_path = testdir.tmpdir.join('subdir', 'cassettes').mkdir()
+    cassette_dir_path.join('test_disable_vcr_iana_marking.yaml').write(cassette_content)
+    cassette_dir_path.join('test_disable_vcr_iana_fixture.yaml').write(cassette_content)
+    cassette_dir_path.join('test_disable_vcr_iana_vcr.yaml').write(cassette_content)
+
+    t0 = cassette_dir_path.join('test_disable_vcr_iana_marking.yaml').mtime()
+
+    result = testdir.runpytest('--vcr-record=none', '-v')
+    result.assert_outcomes(0, 0, 3)
+
+    result = testdir.runpytest('--disable-vcr', '--vcr-record=none', '-v')
+    result.assert_outcomes(3, 0, 0)
+
+    t1 = cassette_dir_path.join('test_disable_vcr_iana_marking.yaml').mtime()
+    # Check that the cassette file is unmodified
+    assert t0 == t1
 
 
 def test_custom_matchers(testdir):

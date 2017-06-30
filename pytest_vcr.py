@@ -41,8 +41,7 @@ def pytest_load_initial_conftests(early_config, parser, args):
 @pytest.fixture(autouse=True)
 def _vcr_marker(request):
     marker = request.node.get_marker('vcr')
-    disable_vcr = request.config.getoption('--disable-vcr')
-    if marker and not disable_vcr:
+    if marker:
         request.getfixturevalue('vcr_cassette')
 
 
@@ -65,6 +64,12 @@ def vcr(request, vcr_config, pytestconfig):
         kwargs.update(marker.kwargs)
     if record_mode:
         kwargs['record_mode'] = record_mode
+
+    disable_vcr = request.config.getoption('--disable-vcr')
+    if disable_vcr:
+        # Set mode to record but discard all responses to disable both recording and playback
+        kwargs['record_mode'] = 'new_episodes'
+        kwargs['before_record_response'] = lambda *args, **kwargs: None
 
     vcr = VCR(**kwargs)
     return vcr
