@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+
 import pytest
 from vcr import VCR
 
@@ -13,6 +14,15 @@ def pytest_addoption(parser):
         default=None,
         choices=['once', 'new_episodes', 'none', 'all'],
         help='Set the recording mode for VCR.py.'
+    )
+    # TODO: deprecated, remove in a future release
+    group.addoption(
+        '--vcr-record-mode',
+        action='store',
+        dest='vcr_record',
+        default=None,
+        choices=['once', 'new_episodes', 'none', 'all'],
+        help='DEPRECATED: use --vcr-record'
     )
     group.addoption(
         '--disable-vcr',
@@ -37,13 +47,18 @@ def _vcr_marker(request):
 
 
 @pytest.fixture
-def vcr(request, vcr_config):
+def vcr(request, vcr_config, pytestconfig):
     """The VCR instance"""
     kwargs = dict(
         path_transformer=VCR.ensure_suffix(".yaml"),
     )
     marker = request.node.get_marker('vcr')
-    record_mode = request.config.getoption('--vcr-record')
+    record_mode = request.config.getoption('--vcr-record-mode')
+    if record_mode:
+        pytestconfig.warn("C1",
+                          "--vcr-record-mode has been deprecated and will be removed in a future "
+                          "release. Use --vcr-record instead.")
+    record_mode = request.config.getoption('--vcr-record') or record_mode
 
     kwargs.update(vcr_config)
     if marker:
