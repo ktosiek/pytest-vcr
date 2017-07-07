@@ -52,7 +52,7 @@ def test_disable_vcr(testdir):
             response = urlopen('http://www.iana.org/domains/reserved').read()
             assert b'Example domains' in response
 
-        def test_disable_vcr_iana_vcr(vcr_cassette, vcr):
+        def test_disable_vcr_iana_vcr(vcr):
             with vcr.use_cassette('test_disable_vcr_iana_vcr'):
                 response = urlopen('http://www.iana.org/domains/reserved').read()
             assert b'Example domains' in response
