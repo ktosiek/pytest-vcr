@@ -17,7 +17,7 @@ def test_iana_example(testdir):
 
     result = testdir.runpytest('-v')
 
-    result.stdout.fnmatch_lines(['*::test_iana PASSED'])
+    result.stdout.fnmatch_lines(['*::test_iana PASSED*'])
 
     cassette_path = testdir.tmpdir.join(
         'subdir', 'cassettes', 'test_iana.yaml')
