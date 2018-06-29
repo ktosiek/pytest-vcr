@@ -40,13 +40,13 @@ def pytest_load_initial_conftests(early_config, parser, args):
 
 @pytest.fixture(autouse=True)
 def _vcr_marker(request):
-    marker = request.node.get_marker('vcr')
+    marker = request.node.get_closest_marker('vcr')
     if marker:
         request.getfixturevalue('vcr_cassette')
 
 
 def _update_kwargs(request, kwargs):
-    marker = request.node.get_marker('vcr')
+    marker = request.node.get_closest_marker('vcr')
     if marker:
         kwargs.update(marker.kwargs)
 
