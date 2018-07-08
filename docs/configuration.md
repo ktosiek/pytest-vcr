@@ -10,6 +10,10 @@ or passing options to the vcr marker.
 Selects the [VCR.py record mode](http://vcrpy.readthedocs.io/en/latest/usage.html#record-modes).
 Useful in CI (where you want --vcr-record=none).
 
+## --disable-vcr
+
+Disable replaying and recording. The VCR is still installed, but shouldn't affect the requests.
+
 # Configuration fixtures
 
 ## vcr_config
