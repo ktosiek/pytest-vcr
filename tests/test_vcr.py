@@ -319,7 +319,7 @@ def test_use_in_function_scope_fixture(testdir):
             from urllib.request import urlopen
         except ImportError:
             from urllib2 import urlopen
-        
+
         @pytest.fixture
         def iana_response(vcr):
             with vcr.use_cassette('iana_response_fixture'):
@@ -345,7 +345,7 @@ def test_use_in_module_scope_fixture(testdir):
             from urllib.request import urlopen
         except ImportError:
             from urllib2 import urlopen
-        
+
         @pytest.fixture(scope='module')
         def iana_response(vcr):
             with vcr.use_cassette('iana_response_fixture'):
