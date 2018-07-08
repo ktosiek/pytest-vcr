@@ -168,26 +168,22 @@ interactions:
 
 
 def test_overriding_cassette_path(testdir):
-    testdir.makepyfile("""
+    testdir.makepyfile(**{'subdir/test_dir': """
         import pytest, os
 
         @pytest.fixture(scope='module')
-        def vcr_cassette_dir():
-            return 'vhs'
-
-        @pytest.fixture
-        def vcr_cassette_name(vcr_cassette_dir, request, vcr_cassette_name):
+        def vcr_cassette_dir(request):
             # Put all cassettes in vhs/{module}/{test}.yaml
-            return os.path.join(vcr_cassette_dir, request.module.__name__, vcr_cassette_name)
+            return os.path.join('vhs', request.module.__name__)
 
         @pytest.mark.vcr
         def test_show_cassette(vcr_cassette):
             print("Cassette: {}".format(vcr_cassette._path))
-    """)
+    """})
 
     result = testdir.runpytest('-s')
+    result.stdout.fnmatch_lines(['*Cassette: vhs/test_dir/test_show_cassette.yaml'])
     result.assert_outcomes(1, 0, 0)
-    result.stdout.fnmatch_lines(['*Cassette: vhs/*/test_show_cassette.yaml'])
 
 
 def test_cassette_name_for_classes(testdir):

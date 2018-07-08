@@ -19,17 +19,17 @@ Default: `{}`
 Additional arguments for the [VCR constructor](http://vcrpy.readthedocs.io/en/latest/configuration.html#configuration), as a dictionary.
 This will be overridden by marker and command-line options.
 
-## vcr_cassette_path
+## vcr_cassette_dir
 
-Default: `test_file_directory + "/cassettes/" + vcr_cassette_name`
+Default: `test_file_directory + "/cassettes/"`
 
-Path to current test's cassette.
+Path to the directory where cassettes should be stored.
 
 ## vcr_cassette_name
 
 Default: name of the test
 
-Name of the current test's cassette
+Name of the current test's cassette.
 
 ## vcr
 

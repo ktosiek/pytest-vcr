@@ -47,13 +47,13 @@ For a way to specify separate configuration for different tests see [Configurati
 
 ## Changing the cassettes library path
 By default pytest-vcr will put cassettes in a `cassettes` directory next to your tests.
-You can change that by overriding the `vcr_cassette_path` fixture:
+You can change that by overriding the `vcr_cassette_dir` fixture:
 
 ```python
-@pytest.fixture
-def vcr_cassette_path(request, vcr_cassette_name):
+@pytest.fixture(scope='module')
+def vcr_cassette_dir(request):
     # Put all cassettes in vhs/{module}/{test}.yaml
-    return os.path.join('vhs', request.module.__name__, vcr_cassette_name)
+    return os.path.join('vhs', request.module.__name__)
 ```
 
 
