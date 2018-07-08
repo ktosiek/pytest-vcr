@@ -5,10 +5,10 @@ or passing options to the vcr marker.
 
 # Command line options
 
-## --vcr-record-mode
+## --vcr-record
 
 Selects the [VCR.py record mode](http://vcrpy.readthedocs.io/en/latest/usage.html#record-modes).
-Useful in CI (where you want --vcr-record-mode=none).
+Useful in CI (where you want --vcr-record=none).
 
 # Configuration fixtures
 
