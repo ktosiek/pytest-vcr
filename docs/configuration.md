@@ -14,6 +14,7 @@ Useful in CI (where you want --vcr-record=none).
 
 ## vcr_config
 
+Scope: module  
 Default: `{}`
 
 Additional arguments for the [VCR constructor](http://vcrpy.readthedocs.io/en/latest/configuration.html#configuration), as a dictionary.
@@ -21,6 +22,7 @@ This will be overridden by marker and command-line options.
 
 ## vcr_cassette_dir
 
+Scope: module  
 Default: `test_file_directory + "/cassettes/"`
 
 Path to the directory where cassettes should be stored.
@@ -33,13 +35,14 @@ Name of the current test's cassette.
 
 ## vcr
 
+Scope: module  
 Default: an instance of `VCR`
 
 This is the instance used for creating cassettes.
 You'd override this fixture to register your own matchers, serializers or persisters, for example:
 
 ```python
-@pytest.fixture
+@pytest.fixture(scope='module')
 def vcr(vcr):
     vcr.register_matcher('my_matcher', my_matcher)
     vcr.match_on = ['my_matcher']  # This can also go into vcr_config or marker kwargs
