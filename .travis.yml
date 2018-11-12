@@ -2,12 +2,19 @@
 
 sudo: false
 language: python
+dist: xenial
 python:
   - "2.7"
   - "3.4"
   - "3.5"
   - "3.6"
-  - "pypy"
+  - "3.7"
+  - "pypy3.5"
+
+matrix:
+  include:
+    - python: 'pypy'
+      dist: trusty
 
 install:
   # coveralls-python needs a newer setuptools to install from git
