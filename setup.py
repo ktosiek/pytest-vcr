@@ -13,7 +13,7 @@ def read(fname):
 
 setup(
     name='pytest-vcr',
-    version='0.3.0',
+    version='1.0.0',
     author='Tomasz Kontusz',
     author_email='tomasz.kontusz@gmail.com',
     maintainer='Tomasz Kontusz',
@@ -25,7 +25,7 @@ setup(
     py_modules=['pytest_vcr'],
     install_requires=['pytest>=3.6.0', 'vcrpy'],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Framework :: Pytest',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Testing',
@@ -36,6 +36,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Operating System :: OS Independent',
