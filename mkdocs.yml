@@ -9,4 +9,5 @@ repo_url: https://github.com/ktosiek/pytest-vcr
 pages:
 - Home: index.md
 - Configuration: configuration.md
+- Changelog: changelog.md
 - Hacking: hacking.md
