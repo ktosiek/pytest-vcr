@@ -254,6 +254,24 @@ def test_overriding_record_mode(testdir):
     result.stdout.fnmatch_lines(['*Cassette record mode: all'])
 
 
+def test_no_warnings(testdir):
+    testdir.makepyfile("""
+        import pytest
+
+        @pytest.fixture(scope='module')
+        def vcr_config():
+            return {'record_mode': 'none'}
+
+        @pytest.mark.vcr(record_mode='once')
+        def test_method(vcr_cassette):
+            print("Cassette record mode: {}".format(vcr_cassette.record_mode))
+    """)
+
+    result = testdir.runpytest('-s', '--vcr-record', 'all')
+    result.assert_outcomes(1, 0, 0)
+    assert 'warnings summary' not in result.stdout.str()
+
+
 def test_deprecated_record_mode(testdir):
     testdir.makepyfile("""
         import pytest
