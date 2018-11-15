@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import warnings
 
 import pytest
 from vcr import VCR
@@ -19,7 +20,7 @@ def pytest_addoption(parser):
     group.addoption(
         '--vcr-record-mode',
         action='store',
-        dest='vcr_record',
+        dest='deprecated_vcr_record',
         default=None,
         choices=['once', 'new_episodes', 'none', 'all'],
         help='DEPRECATED: use --vcr-record'
@@ -62,12 +63,12 @@ def _update_kwargs(request, kwargs):
 
 
 @pytest.fixture(scope='module')
-def vcr(request, pytestconfig, vcr_config, vcr_cassette_dir, ):
+def vcr(request, vcr_config, vcr_cassette_dir, ):
     """The VCR instance"""
     if request.config.getoption('--vcr-record-mode'):
-        pytestconfig.warn("C1",
-                          "--vcr-record-mode has been deprecated and will be removed in a future "
-                          "release. Use --vcr-record instead.")
+        warnings.warn("--vcr-record-mode has been deprecated and will be removed in a future "
+                      "release. Use --vcr-record instead.",
+                      DeprecationWarning)
     kwargs = dict(
         cassette_library_dir=vcr_cassette_dir,
         path_transformer=VCR.ensure_suffix(".yaml"),
