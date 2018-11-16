@@ -11,10 +11,15 @@ python:
   - "3.7"
   - "pypy3.5"
 
+env:
+- PYTEST=3
+- PYTEST=4
+
 matrix:
   include:
     - python: 'pypy'
       dist: trusty
+      env: PYTEST=4
 
 install:
   # coveralls-python needs a newer setuptools to install from git
