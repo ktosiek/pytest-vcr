@@ -4,9 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2018-11-16
+### Changed
+- Only show a deprecation warning for `--vcr-record-mode`, and not for `--vcr-record` - by [Andy Freeland](https://github.com/rouge8).
+
 ## [1.0.0] - 2018-11-12
 Contributors to this release:
-
 - [Marting Valgur](https://github.com/valgur), who made most of the changes in this release.
 - [Andy Freeland](https://github.com/rouge8) adapted the marker usage to pytest 3.6+.
 
