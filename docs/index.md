@@ -34,7 +34,7 @@ It's important to make sure you aren't leaving any secrets in your cassettes.
 For example, when using HTTP Basic authentication, you should add this to your conftest:
 
 ```python
-@pytest.fixture
+@pytest.fixture(scope='module')
 def vcr_config():
     return {
         # Replace the Authorization request header with "DUMMY" in cassettes
