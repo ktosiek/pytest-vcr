@@ -6,7 +6,7 @@ import pytest
 assert pytest.config.pluginmanager.hasplugin("vcr")
 
 
-def test_iana_example(testdir):
+def test_iana_example(testdir, live_server):
     testdir.makepyfile(**{'subdir/test_iana_example': """
         import pytest
         try:
@@ -16,9 +16,9 @@ def test_iana_example(testdir):
 
         @pytest.mark.vcr
         def test_iana():
-            response = urlopen('http://www.iana.org/domains/reserved').read()
+            response = urlopen('ADDR').read()
             assert b'Example domains' in response
-    """})
+    """.replace('ADDR', live_server.address)})
 
     result = testdir.runpytest('-v')
     result.assert_outcomes(1, 0, 0)
@@ -28,7 +28,7 @@ def test_iana_example(testdir):
     assert cassette_path.size() > 50
 
 
-def test_disable_vcr(testdir):
+def test_disable_vcr(testdir, live_server):
     testdir.makepyfile(**{'subdir/test_iana_example': """
         import pytest
         try:
@@ -45,18 +45,18 @@ def test_disable_vcr(testdir):
 
         @pytest.mark.vcr
         def test_disable_vcr_iana_marking():
-            response = urlopen('http://www.iana.org/domains/reserved').read()
+            response = urlopen('ADDR').read()
             assert b'Example domains' in response
 
         def test_disable_vcr_iana_fixture(vcr_cassette):
-            response = urlopen('http://www.iana.org/domains/reserved').read()
+            response = urlopen('ADDR').read()
             assert b'Example domains' in response
 
         def test_disable_vcr_iana_vcr(vcr):
             with vcr.use_cassette('test_disable_vcr_iana_vcr'):
-                response = urlopen('http://www.iana.org/domains/reserved').read()
+                response = urlopen('ADDR').read()
             assert b'Example domains' in response
-    """})
+    """.replace('ADDR', live_server.address)})
 
     result = testdir.runpytest('--vcr-record=none', '-v')
     result.assert_outcomes(0, 0, 3)
@@ -68,7 +68,7 @@ def test_disable_vcr(testdir):
     assert not cassette_dir_path.check()
 
 
-def test_disable_vcr_with_existing_cassette(testdir):
+def test_disable_vcr_with_existing_cassette(testdir, live_server):
     testdir.makepyfile(**{'subdir/test_iana_example': """
         import pytest
         try:
@@ -85,18 +85,18 @@ def test_disable_vcr_with_existing_cassette(testdir):
 
         @pytest.mark.vcr
         def test_disable_vcr_iana_marking():
-            response = urlopen('http://www.iana.org/domains/reserved').read()
+            response = urlopen('ADDR').read()
             assert b'Example domains' in response
 
         def test_disable_vcr_iana_fixture(vcr_cassette):
-            response = urlopen('http://www.iana.org/domains/reserved').read()
+            response = urlopen('ADDR').read()
             assert b'Example domains' in response
 
         def test_disable_vcr_iana_vcr(vcr_cassette, vcr):
             with vcr.use_cassette('test_disable_vcr_iana_vcr'):
-                response = urlopen('http://www.iana.org/domains/reserved').read()
+                response = urlopen('ADDR').read()
             assert b'Example domains' in response
-    """})
+    """.replace('ADDR', live_server.address)})
 
     cassette_content = '''
 version: 1
@@ -129,7 +129,7 @@ interactions:
     assert t0 == t1
 
 
-def test_custom_matchers(testdir):
+def test_custom_matchers(testdir, live_server):
     testdir.makepyfile("""
         import pytest
         try:
@@ -145,9 +145,9 @@ def test_custom_matchers(testdir):
 
         @pytest.mark.vcr
         def test_custom_matchers_iana():
-            response = urlopen('http://www.iana.org/domains/reserved').read()
+            response = urlopen('ADDR').read()
             assert b'From cassette fixture' in response
-    """)
+    """.replace('ADDR', live_server.address))
 
     testdir.tmpdir.mkdir('cassettes').join('test_custom_matchers_iana.yaml') \
         .write('''
@@ -328,7 +328,7 @@ def test_separate_cassettes_for_parametrized_tests(testdir):
     assert result.ret == 0
 
 
-def test_use_in_function_scope_fixture(testdir):
+def test_use_in_function_scope_fixture(testdir, live_server):
     """Test that the VCR instance can be used from fixtures and that the cassettes
     land in the correct location."""
     testdir.makepyfile(**{'subdir/test_iana_example': """
@@ -341,12 +341,12 @@ def test_use_in_function_scope_fixture(testdir):
         @pytest.fixture
         def iana_response(vcr):
             with vcr.use_cassette('iana_response_fixture'):
-                response = urlopen('http://www.iana.org/domains/reserved').read()
+                response = urlopen('ADDR').read()
             return response
 
         def test_with_fixture(iana_response):
             assert b'Example domains' in iana_response
-    """})
+    """.replace('ADDR', live_server.address)})
 
     result = testdir.runpytest('-v')
     result.assert_outcomes(1, 0, 0)
@@ -356,7 +356,7 @@ def test_use_in_function_scope_fixture(testdir):
     assert cassette_path.size() > 50
 
 
-def test_use_in_module_scope_fixture(testdir):
+def test_use_in_module_scope_fixture(testdir, live_server):
     testdir.makepyfile(**{'subdir/test_iana_example': """
         import pytest
         try:
@@ -367,12 +367,12 @@ def test_use_in_module_scope_fixture(testdir):
         @pytest.fixture(scope='module')
         def iana_response(vcr):
             with vcr.use_cassette('iana_response_fixture'):
-                response = urlopen('http://www.iana.org/domains/reserved').read()
+                response = urlopen('ADDR').read()
             return response
 
         def test_with_fixture(iana_response):
             assert b'Example domains' in iana_response
-    """})
+    """.replace('ADDR', live_server.address)})
 
     result = testdir.runpytest('-v')
     result.assert_outcomes(1, 0, 0)
@@ -383,7 +383,7 @@ def test_use_in_module_scope_fixture(testdir):
 
 
 @pytest.mark.xfail(reason="session-scoped fixtures are not supported")
-def test_use_in_session_scope_fixture(testdir):
+def test_use_in_session_scope_fixture(testdir, live_server):
     testdir.makepyfile(**{'subdir/test_iana_example': """
         import pytest
         try:
@@ -399,12 +399,12 @@ def test_use_in_session_scope_fixture(testdir):
         @pytest.fixture(scope='session')
         def iana_response(vcr):
             with vcr.use_cassette('iana_response_fixture'):
-                response = urlopen('http://www.iana.org/domains/reserved').read()
+                response = urlopen('ADDR').read()
             return response
 
         def test_with_fixture(iana_response):
             assert b'Example domains' in iana_response
-    """})
+    """.replace('ADDR', live_server.address)})
 
     result = testdir.runpytest('-v')
     result.assert_outcomes(1, 0, 0)
