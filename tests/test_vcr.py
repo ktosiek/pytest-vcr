@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from unittest import TestCase
 
 import pytest
 
@@ -430,3 +431,25 @@ def test_marker_message(testdir):
     result.stdout.fnmatch_lines([
         '@pytest.mark.vcr: Mark the test as using VCR.py.',
     ])
+
+
+def test_vcr_cassette_name_function(vcr_cassette_name):
+    assert vcr_cassette_name == "test_vcr_cassette_name_function"
+
+
+class TestSimpleClass(object):
+
+    def test_vcr_cassette_name_class(self, vcr_cassette_name):
+        assert vcr_cassette_name == "TestSimpleClass.test_vcr_cassette_name_class"
+
+
+@pytest.fixture
+def vcr_cassette_name_test_case(request, vcr_cassette_name):
+    request.cls.vcr_cassette_name = vcr_cassette_name
+
+
+@pytest.mark.usefixtures("vcr_cassette_name_test_case")
+class TestUnitTestClass(TestCase):
+
+    def test_vcr_cassette_name_class(self):
+        assert self.vcr_cassette_name == "TestUnitTestClass.test_vcr_cassette_name_class"
