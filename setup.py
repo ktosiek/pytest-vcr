@@ -13,7 +13,7 @@ def read(fname):
 
 setup(
     name='pytest-vcr',
-    version='1.0.1',
+    version='1.0.2',
     author='Tomasz Kontusz',
     author_email='tomasz.kontusz@gmail.com',
     maintainer='Tomasz Kontusz',
