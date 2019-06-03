@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import re
 import warnings
 
 import pytest
@@ -99,8 +100,11 @@ def vcr_cassette_name(request):
     """Name of the VCR cassette"""
     test_class = request.cls
     if test_class:
-        return "{}.{}".format(test_class.__name__, request.node.name)
-    return request.node.name
+        cassette_name = "{}.{}".format(test_class.__name__, request.node.name)
+    else:
+        cassette_name = request.node.name
+    # remove forbidden characters in the filename 
+    return re.sub(r'[<>?%*:|"/\\]+', '-', cassette_name)
 
 
 @pytest.fixture(scope='module')
