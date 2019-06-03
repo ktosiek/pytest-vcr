@@ -328,6 +328,7 @@ def test_separate_cassettes_for_parametrized_tests(testdir):
     result = testdir.runpytest('-s')
     assert result.ret == 0
 
+
 def test_separate_cassettes_for_parametrized_tests_forbidden_character(testdir):
     testdir.makepyfile("""
         import pytest
@@ -335,11 +336,12 @@ def test_separate_cassettes_for_parametrized_tests_forbidden_character(testdir):
         @pytest.mark.vcr
         @pytest.mark.parametrize('arg', ['/', '\\\\', '?', '%', '*', ':', '|', '"', '<', '>'])
         def test_parameters(arg, vcr_cassette_name):
-            assert vcr_cassette_name == 'test_parameters[-]' 
+            assert vcr_cassette_name == 'test_parameters[-]'
     """)
 
     result = testdir.runpytest('-s')
     assert result.ret == 0
+
 
 def test_use_in_function_scope_fixture(testdir, live_server):
     """Test that the VCR instance can be used from fixtures and that the cassettes

@@ -103,7 +103,7 @@ def vcr_cassette_name(request):
         cassette_name = "{}.{}".format(test_class.__name__, request.node.name)
     else:
         cassette_name = request.node.name
-    # remove forbidden characters in the filename 
+    # remove forbidden characters in the filename
     return re.sub(r'[<>?%*:|"/\\]+', '-', cassette_name)
 
 
