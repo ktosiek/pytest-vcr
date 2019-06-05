@@ -21,7 +21,9 @@ init:
   - "%PYTHON%/python -c \"import struct;print( 8 * struct.calcsize(\'P\'))\""
 
 install:
-  - "%PYTHON%/Scripts/easy_install -U pip"
+  - "%PYTHON%/python -m pip install --upgrade pip"
+  - "%PYTHON%/python -m pip uninstall -y virtualenv"
+  - "%PYTHON%/Scripts/pip install virtualenv"
   - "%PYTHON%/Scripts/pip install tox"
   - "%PYTHON%/Scripts/pip install wheel"
 
