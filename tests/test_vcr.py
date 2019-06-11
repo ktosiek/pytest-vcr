@@ -201,6 +201,30 @@ def test_cassette_name_for_classes(testdir):
     result.stdout.fnmatch_lines(['*Cassette: TestClass.test_method'])
 
 
+def test_cassette_custom_path(testdir):
+    testdir.makepyfile(
+        """
+        import os
+        import pytest
+
+        @pytest.mark.vcr("custom/path.yaml")
+        def test_cassette_name(vcr_cassette_name, vcr_cassette):
+            assert "custom/path.yaml" == vcr_cassette._path
+            print("Cassette name: {}".format(vcr_cassette_name))
+
+        @pytest.mark.vcr
+        def test_no_path(vcr_cassette_name, vcr_cassette):
+            assert os.path.join("cassettes", "test_no_path.yaml") in vcr_cassette._path
+            print("Cassette name: {}".format(vcr_cassette_name))
+    """
+    )
+
+    result = testdir.runpytest("-s")
+    result.assert_outcomes(2, 0, 0)
+    result.stdout.fnmatch_lines(['*Cassette name: custom/path.yaml'])
+    result.stdout.fnmatch_lines(['*Cassette name: test_no_path'])
+
+
 def test_vcr_config(testdir):
     testdir.makepyfile("""
         import pytest
@@ -228,6 +252,24 @@ def test_marker_options(testdir):
             return {'record_mode': 'all'}
 
         @pytest.mark.vcr(record_mode='none')
+        def test_method(vcr_cassette):
+            print("Cassette record mode: {}".format(vcr_cassette.record_mode))
+    """)
+
+    result = testdir.runpytest('-s')
+    result.assert_outcomes(1, 0, 0)
+    result.stdout.fnmatch_lines(['*Cassette record mode: none'])
+
+
+def test_cassette_custom_path_marker_options(testdir):
+    testdir.makepyfile("""
+        import pytest
+
+        @pytest.fixture(scope='module')
+        def vcr_config():
+            return {'record_mode': 'all'}
+
+        @pytest.mark.vcr("custom/path.yaml", record_mode='none')
         def test_method(vcr_cassette):
             print("Cassette record mode: {}".format(vcr_cassette.record_mode))
     """)

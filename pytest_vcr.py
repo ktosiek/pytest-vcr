@@ -46,6 +46,10 @@ def _vcr_marker(request):
         request.getfixturevalue('vcr_cassette')
 
 
+def _has_custom_name(marker):
+    return marker and marker.args
+
+
 def _update_kwargs(request, kwargs):
     marker = request.node.get_closest_marker('vcr')
     if marker:
@@ -62,9 +66,8 @@ def _update_kwargs(request, kwargs):
         kwargs['before_record_response'] = lambda *args, **kwargs: None
 
 
-@pytest.fixture(scope='module')
-def vcr(request, vcr_config, vcr_cassette_dir, ):
-    """The VCR instance"""
+def _vcr(request, vcr_config, vcr_cassette_dir, ):
+    """Create VCR instance"""
     if request.config.getoption('--vcr-record-mode'):
         warnings.warn("--vcr-record-mode has been deprecated and will be removed in a future "
                       "release. Use --vcr-record instead.",
@@ -79,11 +82,28 @@ def vcr(request, vcr_config, vcr_cassette_dir, ):
     return vcr
 
 
+@pytest.fixture(scope='module')
+def vcr(request, vcr_config, vcr_cassette_dir, ):
+    """The VCR instance, module level fixture"""
+    return _vcr(request, vcr_config, vcr_cassette_dir, )
+
+
 @pytest.fixture
-def vcr_cassette(request, vcr, vcr_cassette_name):
+def vcr_per_test(request, vcr_config):
+    """The VCR instance, function level fixture"""
+    return _vcr(request, vcr_config, None)
+
+
+@pytest.fixture
+def vcr_cassette(request, vcr_cassette_name):
     """Wrap a test in a VCR.py cassette"""
     kwargs = {}
     _update_kwargs(request, kwargs)
+    marker = request.node.get_closest_marker("vcr")
+    if _has_custom_name(marker):
+        vcr = request.getfixturevalue("vcr_per_test")
+    else:
+        vcr = request.getfixturevalue("vcr")
     with vcr.use_cassette(vcr_cassette_name, **kwargs) as cassette:
         yield cassette
 
@@ -97,6 +117,9 @@ def vcr_cassette_dir(request):
 @pytest.fixture
 def vcr_cassette_name(request):
     """Name of the VCR cassette"""
+    marker = request.node.get_closest_marker("vcr")
+    if _has_custom_name(marker):
+        return marker.args[0]
     test_class = request.cls
     if test_class:
         return "{}.{}".format(test_class.__name__, request.node.name)
