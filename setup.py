@@ -22,7 +22,7 @@ setup(
     url='https://github.com/ktosiek/pytest-vcr',
     description='Plugin for managing VCR.py cassettes',
     long_description=read('README.rst'),
-    py_modules=['pytest_vcr'],
+    packages=['pytest_vcr'],
     install_requires=['pytest>=3.6.0', 'vcrpy'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -44,7 +44,7 @@ setup(
     ],
     entry_points={
         'pytest11': [
-            'vcr = pytest_vcr',
+            'vcr = pytest_vcr.plugin',
         ],
     },
 )
