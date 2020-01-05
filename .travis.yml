@@ -13,6 +13,7 @@ env:
 - PYTEST=3
 - PYTEST=4
 - PYTEST=5
+- PYTEST=master
 
 matrix:
   include:
@@ -27,6 +28,10 @@ matrix:
       env: PYTEST=3
     - python: 3.4
       env: PYTEST=4
+
+jobs:
+  allow_failures:
+    - env: PYTEST=master
 
 install:
   # coveralls-python needs a newer setuptools to install from git
