@@ -4,8 +4,6 @@ sudo: false
 language: python
 dist: xenial
 python:
-  - "2.7"
-  - "3.4"
   - "3.5"
   - "3.6"
   - "3.7"
@@ -14,11 +12,20 @@ python:
 env:
 - PYTEST=3
 - PYTEST=4
+- PYTEST=5
 
 matrix:
   include:
     - python: 'pypy'
       dist: trusty
+      env: PYTEST=4
+    - python: 2.7
+      env: PYTEST=3
+    - python: 2.7
+      env: PYTEST=4
+    - python: 3.4
+      env: PYTEST=3
+    - python: 3.4
       env: PYTEST=4
 
 install:
