@@ -3,8 +3,11 @@ from unittest import TestCase
 
 import pytest
 
-# Check that the plugin has been properly installed before proceeding
-assert pytest.config.pluginmanager.hasplugin("vcr")
+
+@pytest.fixture(scope='session', autouse=True)
+def plugin_was_loaded(pytestconfig):
+    # Check that the plugin has been properly installed before proceeding
+    assert pytestconfig.pluginmanager.hasplugin("vcr")
 
 
 def test_iana_example(testdir, live_server):
