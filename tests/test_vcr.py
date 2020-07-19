@@ -323,9 +323,23 @@ def test_separate_cassettes_for_parametrized_tests(testdir):
         import pytest
 
         @pytest.mark.vcr
-        @pytest.mark.parametrize('arg', ['a', 'b'])
+        @pytest.mark.parametrize('arg', ['a', 'b', 'Z', '1', '_', '-'])
         def test_parameters(arg, vcr_cassette_name):
             assert vcr_cassette_name == 'test_parameters[{}]'.format(arg)
+    """)
+
+    result = testdir.runpytest('-s')
+    assert result.ret == 0
+
+
+def test_separate_cassettes_for_parametrized_tests_forbidden_character(testdir):
+    testdir.makepyfile("""
+        import pytest
+
+        @pytest.mark.vcr
+        @pytest.mark.parametrize('arg', ['/', '\\\\', '?', '%', '*', ':', '|', '"', '<', '>'])
+        def test_parameters(arg, vcr_cassette_name):
+            assert vcr_cassette_name == 'test_parameters[-]'
     """)
 
     result = testdir.runpytest('-s')
