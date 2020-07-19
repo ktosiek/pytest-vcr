@@ -55,7 +55,7 @@ def vcr(vcr):
 
 
 # Marker options
-All options provided on the marker will be passed to the VCR constructor, for example:
+All options (keyword arguments) provided on the marker will be passed to the VCR constructor, for example:
 
 ```python
 @pytest.mark.vcr(ignore_localhost=True)
@@ -64,4 +64,13 @@ def test_local_and_remote():
     urlopen('http://www.iana.org/domains/reserved').read()
     # This one will always be downloaded
     urlopen('http://127.0.0.1/').read()
+```
+
+It is also posible to specify cassette name and path per test using path as marker first argument
+
+```python
+@pytest.mark.vcr("custom/path/iana.yaml")
+def test_local_and_remote():
+    # This one will replay from the cassette
+    urlopen('http://www.iana.org/domains/reserved').read()
 ```
