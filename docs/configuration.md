@@ -21,7 +21,7 @@ Disable replaying and recording. The VCR is still installed, but shouldn't affec
 Scope: module  
 Default: `{}`
 
-Additional arguments for the [VCR constructor](http://vcrpy.readthedocs.io/en/latest/configuration.html#configuration), as a dictionary.
+Additional arguments for the [VCR constructor](https://vcrpy.readthedocs.io/en/latest/api.html#vcr.config.VCR.__init__), as a dictionary.
 This will be overridden by marker and command-line options.
 
 ## vcr_cassette_dir
