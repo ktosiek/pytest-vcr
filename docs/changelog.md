@@ -27,7 +27,7 @@ Contributors to this release:
 - Only the marker closest to the test will be used for configuring VCR.
 
 ### Deprecated
-- `--vcr-record-mode` is now called `--vcr-record`, the old name is depracated.
+- `--vcr-record-mode` is now called `--vcr-record`, the old name is deprecated.
 
 ### Removed
 - `vcr_cassette_path` fixture was removed - use `vcr_cassette_dir` and `vcr_cassette_name` to set the path.
@@ -43,5 +43,5 @@ Contributors to this release:
 
 ## [0.2.0] - 2017-05-07
 ### Changed
-- Use separate cassettes for each set of test parametes.
+- Use separate cassettes for each set of test parameters.
 - Change the cassettes directory from `_cassettes` to `cassettes`.
