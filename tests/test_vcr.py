@@ -171,6 +171,48 @@ interactions:
     assert result.ret == 0
 
 
+
+def test_refresh(testdir, live_server):
+    testdir.makepyfile("""
+        import pytest
+        try:
+            from urllib.request import urlopen
+        except ImportError:
+            from urllib2 import urlopen
+
+        @pytest.mark.vcr
+        def test_refresh():
+            response = urlopen('ADDR').read()
+            assert b'Example domains Example' in response
+    """.replace('ADDR', live_server.address))
+
+    cassette_dir_path = testdir.tmpdir.mkdir('cassettes').join('test_refresh.yaml')
+    original = '''
+version: 1
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://httpbin.org/ip
+  response:
+    body: {string: !!python/unicode "From cassette fixture"}
+    headers: {}
+    status: {code: 200, message: OK}'''
+    cassette_dir_path.write(original)
+
+    t0 = cassette_dir_path.mtime()
+  
+    testdir.runpytest('-s', '--vcr-record=refresh')
+    new_content = cassette_dir_path.read()
+    assert 'httpbin.org' not in new_content
+    assert live_server.address in new_content
+
+    t1 = cassette_dir_path.mtime()
+    # Check that the cassette file was rewritten
+    assert t1 > t0
+    
+
 def test_overriding_cassette_path(testdir):
     testdir.makepyfile(**{'subdir/test_dir': """
         import pytest, os
