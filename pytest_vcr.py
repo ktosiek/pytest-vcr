@@ -85,7 +85,8 @@ def vcr_cassette(request, vcr, vcr_cassette_name):
     kwargs = {}
     _update_kwargs(request, kwargs)
 
-    if kwargs["record_mode"] == "refresh":
+    refresh = False
+    if kwargs.get("record_mode") == "refresh":
         refresh = True
         kwargs["record_mode"] = 'all'
 
