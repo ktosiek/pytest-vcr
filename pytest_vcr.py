@@ -13,7 +13,7 @@ def pytest_addoption(parser):
         action='store',
         dest='vcr_record',
         default=None,
-        choices=['once', 'new_episodes', 'none', 'all'],
+        choices=['once', 'new_episodes', 'none', 'all', 'refresh'],
         help='Set the recording mode for VCR.py.'
     )
     # TODO: deprecated, remove in a future release
@@ -22,7 +22,7 @@ def pytest_addoption(parser):
         action='store',
         dest='deprecated_vcr_record',
         default=None,
-        choices=['once', 'new_episodes', 'none', 'all'],
+        choices=['once', 'new_episodes', 'none', 'all', 'refresh'],
         help='DEPRECATED: use --vcr-record'
     )
     group.addoption(
@@ -55,7 +55,7 @@ def _update_kwargs(request, kwargs):
     record_mode = request.config.getoption('--vcr-record') or record_mode
     if record_mode:
         kwargs['record_mode'] = record_mode
-
+        
     if request.config.getoption('--disable-vcr'):
         # Set mode to record but discard all responses to disable both recording and playback
         kwargs['record_mode'] = 'new_episodes'
@@ -84,7 +84,19 @@ def vcr_cassette(request, vcr, vcr_cassette_name):
     """Wrap a test in a VCR.py cassette"""
     kwargs = {}
     _update_kwargs(request, kwargs)
+
+    if kwargs["record_mode"] == "refresh":
+        refresh = True
+        kwargs["record_mode"] = 'all'
+
     with vcr.use_cassette(vcr_cassette_name, **kwargs) as cassette:
+        if refresh:
+            # force a cassette rewrite
+            cassette.data = []
+            try:
+                os.remove(cassette._path)
+            except FileNotFoundError:
+                pass
         yield cassette
 
 
