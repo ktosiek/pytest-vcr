@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import codecs
+import os
+
 from setuptools import setup
 
 
@@ -13,7 +14,7 @@ def read(fname):
 
 setup(
     name='pytest-vcr',
-    version='1.0.2',
+    version='1.0.3',
     author='Tomasz Kontusz',
     author_email='tomasz.kontusz@gmail.com',
     maintainer='Tomasz Kontusz',
