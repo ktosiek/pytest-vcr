@@ -13,6 +13,7 @@ env:
 - PYTEST=3
 - PYTEST=4
 - PYTEST=5
+- PYTEST=7
 - PYTEST=master
 
 matrix:
@@ -28,6 +29,8 @@ matrix:
       env: PYTEST=3
     - python: 3.4
       env: PYTEST=4
+    - python: 3.10
+      env: PYTEST=7
 
 jobs:
   allow_failures:
